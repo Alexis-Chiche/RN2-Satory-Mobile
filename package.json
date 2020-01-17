@@ -6,7 +6,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "lint" : "eslint src/"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@apollo/react-hooks": "^3.1.3",

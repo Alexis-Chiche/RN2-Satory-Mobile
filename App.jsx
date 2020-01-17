@@ -1,25 +1,23 @@
 import React from 'react';
-import { Provider as PaperProvider, Button } from 'react-native-paper';
-import { StyleSheet, Text, View } from 'react-native';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import Home from './src/Home';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
+const theme = {
+  ...DefaultTheme,
+  roundness: 3,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#f7ce03',
+    accent: '#f1c40f',
+    background: '#000000',
+    text: '#f7ce03'
   }
-});
+};
 
 export default function App() {
   return (
-    <PaperProvider>
-      <View style={styles.container}>
-        <Button icon="camera" mode="contained" onPress={() => console.log('Pressed')}>
-          Press me
-        </Button>
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
+    <PaperProvider theme={theme}>
+      <Home />
     </PaperProvider>
   );
 }

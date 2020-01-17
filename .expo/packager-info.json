@@ -1,9 +1,9 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": null,
-  "packagerPort": null,
-  "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null
+  "expoServerPort": 19000,
+  "packagerPort": 19001,
+  "packagerPid": 7519,
+  "expoServerNgrokUrl": "https://fa-irp.anonymous.rn2-satory-mobile.exp.direct",
+  "packagerNgrokUrl": "https://packager.fa-irp.anonymous.rn2-satory-mobile.exp.direct",
+  "ngrokPid": 7608
 }
