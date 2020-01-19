@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 import { withTheme, Button, Text } from 'react-native-paper';
 import { StyleSheet, View, AsyncStorage } from 'react-native';
+
+const ME = gql`
+  query me {
+    me {
+      id
+      username
+      role
+    }
+  }
+`;
 
 const styles = StyleSheet.create({
   container: {
@@ -14,6 +26,15 @@ function Home(props) {
   const [value, setValue] = useState('value');
   const [key, setKey] = useState('');
   const { colors } = props.theme;
+
+  const { loading, error, data } = useQuery(ME);
+
+  if (loading) return <Text>loading...</Text>;
+  if (error) {
+    console.log(error);
+    return <Text>Error</Text>;
+  }
+  //console.log('ici', data);
 
   const storeKey = async () => {
     try {
