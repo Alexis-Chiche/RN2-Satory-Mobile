@@ -1,32 +1,38 @@
 import React from 'react';
+import { AppRegistry } from 'react-native';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-//import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
-import Home from './src/Home';
 import Client from './src/Apollo/Client';
+import RootNavigator from './src/RootStack';
 
 const theme = {
   ...DefaultTheme,
   roundness: 3,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#f7ce03',
-    accent: '#f1c40f',
-    background: '#000000',
-    text: '#f7ce03'
+    primary: '#D89715',
+    accent: '#C9CAD9',
+    disabled: '#40434E',
+    backdrop: '#E2F1AF',
+    placeholder: '#F9BC2C',
+    background: '#0A0908',
+    text: '#F9BC2C'
   }
 };
 
 const client = new ApolloClient({
-  uri: 'https://api.greefine.fr/'
+  uri: 'http://127.0.0.1:4000/'
 });
 
 export default function App() {
   return (
-    <Client>
+    <ApolloProvider client={client}>
       <PaperProvider theme={theme}>
-        <Home />
+        <RootNavigator />
       </PaperProvider>
-    </Client>
+    </ApolloProvider>
   );
 }
+
+AppRegistry.registerComponent('MyApplication', () => App);
