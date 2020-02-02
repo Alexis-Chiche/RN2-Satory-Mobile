@@ -20,12 +20,12 @@ class Client extends Component {
 
   async componentDidMount() {
     const httpLink = new HttpLink({
-      uri: 'https://api.greefine.fr/',
+      uri: 'http://127.0.0.1:4000',
       credentials: 'include'
     });
 
     const wsLink = new WebSocketLink({
-      uri: 'wss://api.greefine.fr/',
+      uri: 'wss://127.0.0.1:4000',
       options: {
         reconnect: true
       }
