@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import Logo from './logo_satory.png';
+import Logo from '../../../assets/logo_satory.png';
 
 const styles = StyleSheet.create({
   logo: {

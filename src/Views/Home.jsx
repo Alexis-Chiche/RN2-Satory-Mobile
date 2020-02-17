@@ -1,7 +1,8 @@
-import React from 'react';
-import { withTheme, Button, Title, Divider } from 'react-native-paper';
-import { StyleSheet, View, Image } from 'react-native';
-import Logo from '../assets/logo_satory.png';
+import React, { useState } from 'react';
+import { withTheme, Button, Title } from 'react-native-paper';
+import { StyleSheet, View, Image, AsyncStorage } from 'react-native';
+
+import Logo from '../../assets/logo_satory.png';
 
 const styles = StyleSheet.create({
   container: {
@@ -31,7 +32,11 @@ const styles = StyleSheet.create({
 function Home(props) {
   const { colors } = props.theme;
   const { navigation } = props;
+  const [loggedIn, setLoggedIn] = useState(false);
 
+  AsyncStorage.getItem('isLoggedIn', (err, result) => {
+    if (result !== null && result === 'true') setLoggedIn(true);
+  });
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Image source={Logo} style={styles.logo} />

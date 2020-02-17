@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { withTheme, Button, TextInput, HelperText, Title } from 'react-native-paper';
-import { StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, ScrollView, KeyboardAvoidingView, Text } from 'react-native';
+import { useMutation } from 'react-apollo';
+
+import { REGISTER } from '../Apollo/mutation/AuthMutation';
+import UsernameInput from '../Components/Inputs/UsernameInput';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -9,12 +12,18 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     flexDirection: 'column'
   },
   title: {
     alignSelf: 'center',
     fontWeight: 'bold'
+  },
+  error: {
+    color: '#D72638',
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: 14
   }
 });
 
@@ -25,12 +34,16 @@ function Register(props) {
   const [username, setUsername] = useState({ value: '', error: false });
   const [password, setPassword] = useState({ value: '', error: false });
   const [validPassword, setValidPassword] = useState({ value: '', error: false });
-
-  function validateUsername() {
-    const pattern = /[a-zA-Z][a-zA-Z0-9-_]{3,32}/g;
-    if (username.value === '') setUsername({ ...username, error: false });
-    else setUsername({ ...username, error: !pattern.test(username.value) });
-  }
+  const [errForm, setErrForm] = useState(false);
+  const [createUser] = useMutation(REGISTER, {
+    onCompleted: () => {
+      navigation.navigate('LoginScreen');
+    },
+    onError: error => {
+      console.log(error);
+      setErrForm(true);
+    }
+  });
 
   function validateValidPassword() {
     if (validPassword.value === '' && password.value === '')
@@ -45,22 +58,24 @@ function Register(props) {
     validateValidPassword();
   }
 
+  function onSubmit() {
+    if (username.value === '' || password.value === '') setErrForm(true);
+    else if (username.error || password.error) setErrForm(true);
+    else {
+      createUser({ variables: { password: password.value, username: username.value } });
+    }
+  }
+
   return (
     <KeyboardAvoidingView style={styles.wrapper} behavior="padding" keyboardVerticalOffset={30}>
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <Title style={styles.title}>Inscrivez vous</Title>
-        <TextInput
-          underlineColor="gold"
-          label="Nom d'utilisateur"
-          error={username.error}
-          value={username.value}
-          onChangeText={newValue => setUsername({ ...username, value: newValue })}
-          onBlur={validateUsername}
-        />
-        <HelperText type="error" visible={username.error}>
-          Le nom d&apos;utilisateur doit avoir au minimum quatre caractères et doit commencer par
-          une lettre
-        </HelperText>
+        {errForm && (
+          <Title style={styles.error}>
+            Erreur lors de la création du compte , veuillez vérifier les champs remplis.
+          </Title>
+        )}
+        <UsernameInput username={username} setUsername={setUsername} />
         <TextInput
           secureTextEntry
           underlineColor="gold"
@@ -86,7 +101,7 @@ function Register(props) {
         <HelperText type="error" visible={validPassword.error}>
           Les deux mots de passes ne sont pas identique
         </HelperText>
-        <Button onPress={() => navigation.navigate('HomeScreen')}>Inscrivez vous</Button>
+        <Button onPress={onSubmit}>Inscrivez vous</Button>
       </ScrollView>
     </KeyboardAvoidingView>
   );

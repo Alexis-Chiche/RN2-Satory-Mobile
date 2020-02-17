@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { withTheme, Button, TextInput, Title } from 'react-native-paper';
-import { StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, ScrollView, KeyboardAvoidingView, AsyncStorage } from 'react-native';
+import { useMutation } from 'react-apollo';
+
+import { LOGIN } from '../Apollo/mutation/AuthMutation';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -30,11 +32,34 @@ function Login(props) {
 
   const [username, setUsername] = useState({ value: '', error: false });
   const [password, setPassword] = useState({ value: '', error: false });
+  const [errForm, setErrForm] = useState(false);
+  const [loginUser] = useMutation(LOGIN, {
+    onCompleted: async () => {
+      AsyncStorage.setItem('isLoggedIn', 'true').then(navigation.navigate('Auth'));
+    },
+    onError: async e => {
+      if (e.message.includes('Already connected'))
+        AsyncStorage.setItem('isLoggedIn', 'true').then(navigation.navigate('Auth'));
+      setErrForm(true);
+    }
+  });
+
+  function onSubmit() {
+    if (username.value === '' || password.value === '') setErrForm(true);
+    else if (username.error || password.error) setErrForm(true);
+    else {
+      setErrForm(false);
+      loginUser({ variables: { password: password.value, username: username.value } });
+    }
+  }
 
   return (
     <KeyboardAvoidingView style={styles.wrapper} behavior="padding" keyboardVerticalOffset={30}>
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <Title style={styles.title}>Connexion</Title>
+        {errForm && (
+          <Title style={styles.error}>Une erreur est survenue, veuillez ressayer plus tard.</Title>
+        )}
         <TextInput
           underlineColor="gold"
           label="Nom d'utilisateur"
@@ -53,7 +78,7 @@ function Login(props) {
           style={styles.button}
           mode="contained"
           disabled={username.value === '' || password.value === ''}
-          onPress={() => navigation.navigate('HomeScreen')}
+          onPress={onSubmit}
         >
           Se connecter
         </Button>
