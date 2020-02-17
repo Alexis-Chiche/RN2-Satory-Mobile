@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppRegistry } from 'react-native';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-import { ApolloProvider } from '@apollo/react-hooks';
-import ApolloClient from 'apollo-boost';
 import Client from './src/Apollo/Client';
-import RootNavigator from './src/RootStack';
+import RootNavigator from './src/Utils/Router';
+import Splash from './src/Utils/Splash';
 
 const theme = {
   ...DefaultTheme,
@@ -17,21 +16,20 @@ const theme = {
     backdrop: '#E2F1AF',
     placeholder: '#F9BC2C',
     background: '#0A0908',
-    text: '#F9BC2C'
+    text: '#D89715'
   }
 };
 
-const client = new ApolloClient({
-  uri: 'http://127.0.0.1:4000/'
-});
-
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
   return (
-    <ApolloProvider client={client}>
-      <PaperProvider theme={theme}>
-        <RootNavigator />
-      </PaperProvider>
-    </ApolloProvider>
+    <Splash setIsLoggedIn={setIsLoggedIn}>
+      <Client>
+        <PaperProvider theme={theme}>
+          <RootNavigator isLoggedIn={isLoggedIn} />
+        </PaperProvider>
+      </Client>
+    </Splash>
   );
 }
 

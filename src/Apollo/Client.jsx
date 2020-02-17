@@ -20,12 +20,12 @@ class Client extends Component {
 
   async componentDidMount() {
     const httpLink = new HttpLink({
-      uri: 'http://127.0.0.1:4000',
+      uri: 'http://192.168.1.24:4000',
       credentials: 'include'
     });
 
     const wsLink = new WebSocketLink({
-      uri: 'wss://127.0.0.1:4000',
+      uri: 'wss://192.168.1.24:4000',
       options: {
         reconnect: true
       }
@@ -45,7 +45,6 @@ class Client extends Component {
     try {
       await persistCache({
         cache,
-        // eslint-disable-next-line no-undef
         storage: AsyncStorage
       });
     } catch (error) {
