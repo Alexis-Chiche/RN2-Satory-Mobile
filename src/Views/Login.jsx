@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PropTypes } from 'prop-types';
 import { withTheme, Button, TextInput, Title } from 'react-native-paper';
 import { StyleSheet, ScrollView, KeyboardAvoidingView, AsyncStorage } from 'react-native';
 import { useMutation } from 'react-apollo';
@@ -23,24 +24,29 @@ const styles = StyleSheet.create({
   title: {
     alignSelf: 'center',
     fontWeight: 'bold'
+  },
+  error: {
+    color: '#D72638',
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: 14
   }
 });
 
-function Login(props) {
-  const { colors } = props.theme;
-  const { navigation } = props;
+function Login({ navigation, theme }) {
+  const { colors } = theme;
 
   const [username, setUsername] = useState({ value: '', error: false });
   const [password, setPassword] = useState({ value: '', error: false });
   const [errForm, setErrForm] = useState(false);
   const [loginUser] = useMutation(LOGIN, {
     onCompleted: async () => {
-      AsyncStorage.setItem('isLoggedIn', 'true').then(navigation.navigate('Auth'));
+      AsyncStorage.setItem('isLoggedIn', 'true').then(navigation.navigate('Event'));
     },
     onError: async e => {
-      if (e.message.includes('Already connected'))
-        AsyncStorage.setItem('isLoggedIn', 'true').then(navigation.navigate('Auth'));
-      setErrForm(true);
+      if (e.message.includes('Already connected')) {
+        AsyncStorage.setItem('isLoggedIn', 'true').then(navigation.navigate('Event'));
+      } else setErrForm(true);
     }
   });
 
@@ -76,7 +82,7 @@ function Login(props) {
         />
         <Button
           style={styles.button}
-          mode="contained"
+          icon="login"
           disabled={username.value === '' || password.value === ''}
           onPress={onSubmit}
         >
@@ -87,6 +93,19 @@ function Login(props) {
   );
 }
 
-export default withTheme(Login);
+Login.propTypes = {
+  theme: PropTypes.shape({
+    colors: PropTypes.shape({
+      background: PropTypes.string.isRequired
+    })
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    state: PropTypes.shape({
+      params: PropTypes.shape({})
+    }).isRequired,
+    goBack: PropTypes.func.isRequired
+  }).isRequired
+};
 
-Login.propTypes = {};
+export default withTheme(Login);

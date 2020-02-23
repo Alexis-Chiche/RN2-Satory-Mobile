@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { PropTypes } from 'prop-types';
 import {
   AsyncStorage,
   ScrollView,
@@ -9,13 +10,11 @@ import {
 } from 'react-native';
 import { withTheme, Button, Title, TextInput, HelperText } from 'react-native-paper';
 import { useApolloClient, useMutation, useQuery } from 'react-apollo';
-import * as ImagePicker from 'expo-image-picker';
-import Constants from 'expo-constants';
-import * as Permissions from 'expo-permissions';
 
 import UsernameInput from '../Components/Inputs/UsernameInput';
 import { LOGOUT, UPDATE_USER } from '../Apollo/mutation/AuthMutation';
 import { ME } from '../Apollo/query/AuthQuery';
+import CameraPicker from '../Components/Buttons/Camera';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -25,9 +24,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     flexDirection: 'column'
-  },
-  input: {
-    marginBottom: 50
   },
   button: {
     marginVertical: 15
@@ -54,7 +50,6 @@ const styles = StyleSheet.create({
 function Settings({ navigation, theme }) {
   const client = useApolloClient();
   const [image, setImage] = useState(null);
-  const [permission, setPermission] = useState('');
   const { loading, error, data } = useQuery(ME);
 
   const [errForm, setErrForm] = useState(false);
@@ -82,30 +77,6 @@ function Settings({ navigation, theme }) {
       setErrForm(true);
     }
   });
-
-  useEffect(() => {
-    if (Constants.platform.ios) {
-      const { status } = Permissions.askAsync(Permissions.CAMERA_ROLL);
-      setPermission(true);
-      if (status !== 'granted') {
-        setPermission(false);
-        alert('Sorry, we need camera roll permissions to make this work!');
-      }
-    }
-  });
-
-  async function pickImage() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      base64: true
-    });
-    if (!result.cancelled) {
-      setImage(result.uri);
-    }
-  }
 
   function validateValidPassword() {
     if (validPassword.value === '' && password.value === '')
@@ -146,15 +117,8 @@ function Settings({ navigation, theme }) {
             Une erreur est survenu, veuillez verifier les champs reseignés et reessayer plus tard.
           </Title>
         )}
-        {image && <Image source={{ uri: image }} style={styles.image} />}
-        <Button
-          style={styles.button}
-          icon="camera-account"
-          disabled={permission}
-          onPress={() => pickImage()}
-        >
-          Modifier votre image de profil
-        </Button>
+        {image && <Image source={{ uri: image.uri }} style={styles.image} />}
+        <CameraPicker setImage={setImage} />
         <UsernameInput username={username} setUsername={setUsername} />
         <TextInput underlineColor="gold" label="Role" disabled value={data.me.role} />
         <TextInput
@@ -192,5 +156,17 @@ function Settings({ navigation, theme }) {
     </KeyboardAvoidingView>
   );
 }
+
+Settings.propTypes = {
+  theme: PropTypes.shape({
+    colors: PropTypes.shape({
+      background: PropTypes.string.isRequired
+    })
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired
+  }).isRequired
+};
 
 export default withTheme(Settings);

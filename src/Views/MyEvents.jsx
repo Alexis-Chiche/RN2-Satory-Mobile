@@ -1,14 +1,14 @@
 import React from 'react';
+import { PropTypes } from 'prop-types';
 import { useQuery } from 'react-apollo';
 import { Button, Card, Text, withTheme, Title } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+
 import { GET_MY_EVENTS } from '../Apollo/query/EventQuery';
+import EventPreview from '../Components/Events/EventPreview';
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1
-  },
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -20,29 +20,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1.5,
     borderBottomColor: '#F9BC2C'
   },
-  input: {
-    marginBottom: 50
-  },
   button: {
     marginVertical: 15
   },
   title: {
     alignSelf: 'center',
     fontWeight: 'bold'
-  },
-  image: {
-    marginTop: 15,
-    alignSelf: 'center',
-    width: 200,
-    height: 200,
-    borderRadius: 200 / 2
   }
 });
 
 function MyEvents({ navigation, theme }) {
   const { colors } = theme;
 
-  const { loading, error, data, refetch } = useQuery(GET_MY_EVENTS);
+  const { loading, error, data } = useQuery(GET_MY_EVENTS);
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>{error.message}</Text>;
@@ -51,7 +41,7 @@ function MyEvents({ navigation, theme }) {
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <Card style={[styles.card, { backgroundColor: colors.background }]}>
         <Card.Content>
-          <Title style={styles.title}>Creation d'un événement</Title>
+          <Title style={styles.title}>Creation d&apos;un événement</Title>
           <Button
             style={styles.button}
             icon="calendar-plus"
@@ -64,28 +54,31 @@ function MyEvents({ navigation, theme }) {
       <Card style={[styles.card, { backgroundColor: colors.background }]}>
         <Card.Content>
           <Title style={styles.title}>Mes événements</Title>
-          <Card>
-            <Title>Test</Title>
-          </Card>
-          <Card>
-            <Title>Test</Title>
-          </Card>
-          <Card>
-            <Title>Test</Title>
-          </Card>
-          <Card>
-            <Title>Test</Title>
-          </Card>
-          <Card>
-            <Title>Test</Title>
-          </Card>
-          <Card>
-            <Title>Test</Title>
-          </Card>
+          {data.me.myevents.map(event => {
+            return (
+              <EventPreview
+                key={event.id}
+                navigation={navigation}
+                myId={data.me.id}
+                event={event}
+              />
+            );
+          })}
         </Card.Content>
       </Card>
     </ScrollView>
   );
 }
+
+MyEvents.propTypes = {
+  theme: PropTypes.shape({
+    colors: PropTypes.shape({
+      background: PropTypes.string.isRequired
+    })
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired
+  }).isRequired
+};
 
 export default withTheme(MyEvents);

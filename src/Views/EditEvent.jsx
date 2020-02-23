@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { PropTypes } from 'prop-types';
 import { ScrollView, KeyboardAvoidingView, StyleSheet, Image } from 'react-native';
-import { withTheme, Button, Title, TextInput, DarkTheme } from 'react-native-paper';
+import { withTheme, Button, Title, TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as ImagePicker from 'expo-image-picker';
-import Constants from 'expo-constants';
-import * as Permissions from 'expo-permissions';
 import { useMutation } from 'react-apollo';
 
-import { GET_MY_EVENTS, GET_ALL_EVENTS } from '../Apollo/query/EventQuery';
-import { CREATE_EVENT } from '../Apollo/mutation/EventMutation';
+import { GET_MY_EVENTS } from '../Apollo/query/EventQuery';
+import { CREATE_EVENT, UPDATE_EVENT } from '../Apollo/mutation/EventMutation';
+import CameraPicker from '../Components/Buttons/Camera';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -18,9 +17,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     flexDirection: 'column'
-  },
-  input: {
-    marginBottom: 50
   },
   button: {
     marginVertical: 15
@@ -48,11 +44,18 @@ const styles = StyleSheet.create({
 });
 
 function EditEvent({ navigation, theme }) {
+  const { colors } = theme;
+  const {
+    state: { params: event }
+  } = navigation;
+
   const [image, setImage] = useState(null);
-  const [permission, setPermission] = useState('');
-  const [eventTitle, setEventTitle] = useState('');
-  const [eventDescr, setEventDescr] = useState('');
-  const [eventDate, setEventDate] = useState({ value: new Date(), show: false });
+  const [eventTitle, setEventTitle] = useState(event?.event.title);
+  const [eventDescr, setEventDescr] = useState(event?.event.title);
+  const [eventDate, setEventDate] = useState({
+    value: event?.event.date ? new Date(event?.event.date) : new Date(),
+    show: false
+  });
   const [errEvent, setErrEvent] = useState(false);
 
   const [createEvent] = useMutation(CREATE_EVENT, {
@@ -67,62 +70,38 @@ function EditEvent({ navigation, theme }) {
           }
         }
       });
-      const { events } = cache.readQuery({ query: GET_ALL_EVENTS });
-      cache.writeQuery({
-        query: GET_ALL_EVENTS,
-        data: {
-          events: {
-            events: [...events, data.createEvent]
-          }
-        }
-      });
     },
-    onCompleted: data => {
-      console.log(data);
+    onCompleted: () => {
       navigation.goBack();
     },
-    onError: error => {
-      console.log(error);
+    onError: () => {
       setErrEvent(true);
     }
   });
 
-  const { colors } = theme;
-
-  useEffect(() => {
-    if (Constants.platform.ios) {
-      const { status } = Permissions.askAsync(Permissions.CAMERA_ROLL);
-      setPermission(true);
-      if (status !== 'granted') {
-        setPermission(false);
-        alert('Sorry, we need camera roll permissions to make this work!');
-      }
+  const [updateEvent] = useMutation(UPDATE_EVENT, {
+    onCompleted: () => {
+      navigation.goBack();
+    },
+    onError: () => {
+      setErrEvent(true);
     }
-
-    if (navigation.state.params?.id) console.log('Got ID');
-  }, [navigation]);
-
-  async function pickImage() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      base64: true
-    });
-    if (!result.cancelled) {
-      setImage(result.uri);
-    }
-  }
+  });
 
   function onSubmit() {
     if (new Date() >= eventDate.value || eventTitle === '') {
       setErrEvent(true);
       return;
     }
-    if (navigation.state.params?.id) {
-      //TODO : EDIT LOGIC
-      console.log('id');
+    if (event?.event) {
+      updateEvent({
+        variables: {
+          id: event.event.id,
+          title: eventTitle,
+          content: eventDescr,
+          date: eventDate.value
+        }
+      });
     } else {
       createEvent({
         variables: { title: eventTitle, content: eventDescr, date: eventDate.value }
@@ -135,15 +114,8 @@ function EditEvent({ navigation, theme }) {
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <Title style={styles.title}>Nouvel événement</Title>
         {errEvent && <Title style={styles.error}>Verifiez les champs renseignés</Title>}
-        {image && <Image source={{ uri: image }} style={styles.image} />}
-        <Button
-          style={styles.button}
-          icon="camera-account"
-          disabled={permission}
-          onPress={() => pickImage()}
-        >
-          {image ? 'Modifiez la photo' : 'Ajoutez une photo'}
-        </Button>
+        {image && <Image source={{ uri: image.uri }} style={styles.image} />}
+        <CameraPicker setImage={setImage} />
         <TextInput
           label="Nom de l'événement"
           value={eventTitle}
@@ -158,15 +130,13 @@ function EditEvent({ navigation, theme }) {
             setEventDate({ ...eventDate, show: true });
           }}
         >
-          {eventDate.value
-            ? `Date prévue : ${eventDate.value.toLocaleDateString('en-GB')}`
-            : 'Ajoutez une date'}
+          {`Date prévue : ${eventDate.value.toLocaleDateString('en-US')}`}
         </Button>
         {eventDate.show && (
           <DateTimePicker
             value={eventDate.value}
             mode="date"
-            onChange={(_, date) => setEventDate({ value: date, show: false })}
+            onChange={(_, date) => (date ? setEventDate({ value: date, show: false }) : null)}
           />
         )}
         <TextInput
@@ -176,11 +146,26 @@ function EditEvent({ navigation, theme }) {
           underlineColor="gold"
         />
         <Button style={styles.button} icon="content-save-edit" onPress={onSubmit}>
-          {navigation.state.params?.id ? 'Modifier ses informations' : "Créez l'événement"}
+          {event?.event ? 'Modifier ses informations' : "Créez l'événement"}
         </Button>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
+EditEvent.propTypes = {
+  theme: PropTypes.shape({
+    colors: PropTypes.shape({
+      background: PropTypes.string.isRequired
+    })
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    state: PropTypes.shape({
+      params: PropTypes.shape({})
+    }).isRequired,
+    goBack: PropTypes.func.isRequired
+  }).isRequired
+};
 
 export default withTheme(EditEvent);

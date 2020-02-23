@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { PropTypes } from 'prop-types';
 import { withTheme, Button, TextInput, HelperText, Title } from 'react-native-paper';
-import { StyleSheet, ScrollView, KeyboardAvoidingView, Text } from 'react-native';
+import { StyleSheet, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useMutation } from 'react-apollo';
 
 import { REGISTER } from '../Apollo/mutation/AuthMutation';
@@ -27,9 +28,8 @@ const styles = StyleSheet.create({
   }
 });
 
-function Register(props) {
-  const { colors } = props.theme;
-  const { navigation } = props;
+function Register({ navigation, theme }) {
+  const { colors } = theme;
 
   const [username, setUsername] = useState({ value: '', error: false });
   const [password, setPassword] = useState({ value: '', error: false });
@@ -39,8 +39,7 @@ function Register(props) {
     onCompleted: () => {
       navigation.navigate('LoginScreen');
     },
-    onError: error => {
-      console.log(error);
+    onError: () => {
       setErrForm(true);
     }
   });
@@ -107,6 +106,19 @@ function Register(props) {
   );
 }
 
-export default withTheme(Register);
+Register.propTypes = {
+  theme: PropTypes.shape({
+    colors: PropTypes.shape({
+      background: PropTypes.string.isRequired
+    })
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    state: PropTypes.shape({
+      params: PropTypes.shape({})
+    }).isRequired,
+    goBack: PropTypes.func.isRequired
+  }).isRequired
+};
 
-Register.propTypes = {};
+export default withTheme(Register);
