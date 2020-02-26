@@ -38,8 +38,9 @@ const styles = StyleSheet.create({
   image: {
     marginTop: 15,
     alignSelf: 'center',
-    width: 300,
-    height: 200
+    width: 240,
+    height: 160,
+    borderRadius: 200 / 2
   }
 });
 
@@ -49,9 +50,9 @@ function EditEvent({ navigation, theme }) {
     state: { params: event }
   } = navigation;
 
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(event?.event.picture);
   const [eventTitle, setEventTitle] = useState(event?.event.title);
-  const [eventDescr, setEventDescr] = useState(event?.event.title);
+  const [eventDescr, setEventDescr] = useState(event?.event.content);
   const [eventDate, setEventDate] = useState({
     value: event?.event.date ? new Date(event?.event.date) : new Date(),
     show: false
@@ -99,12 +100,13 @@ function EditEvent({ navigation, theme }) {
           id: event.event.id,
           title: eventTitle,
           content: eventDescr,
-          date: eventDate.value
+          date: eventDate.value,
+          picture: image
         }
       });
     } else {
       createEvent({
-        variables: { title: eventTitle, content: eventDescr, date: eventDate.value }
+        variables: { title: eventTitle, content: eventDescr, date: eventDate.value, picture: image }
       });
     }
   }
@@ -112,9 +114,14 @@ function EditEvent({ navigation, theme }) {
   return (
     <KeyboardAvoidingView style={styles.wrapper} behavior="padding" keyboardVerticalOffset={30}>
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-        <Title style={styles.title}>Nouvel événement</Title>
+        <Title style={styles.title}>Edition événement</Title>
         {errEvent && <Title style={styles.error}>Verifiez les champs renseignés</Title>}
-        {image && <Image source={{ uri: image.uri }} style={styles.image} />}
+        {image && (
+          <Image
+            source={{ isStatic: true, uri: `data:image/png;base64,${image}` }}
+            style={styles.image}
+          />
+        )}
         <CameraPicker setImage={setImage} />
         <TextInput
           label="Nom de l'événement"

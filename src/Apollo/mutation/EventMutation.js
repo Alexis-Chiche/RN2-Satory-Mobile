@@ -1,10 +1,11 @@
 import { gql } from 'apollo-boost';
 
 export const CREATE_EVENT = gql`
-  mutation createEvent($title: String!, $content: String!, $date: DateTime!) {
-    createEvent(title: $title, content: $content, date: $date) {
+  mutation createEvent($title: String!, $content: String!, $date: DateTime!, $picture: String) {
+    createEvent(title: $title, content: $content, date: $date, picture: $picture) {
       id
       title
+      picture
       content
       date
       updatedAt
@@ -31,11 +32,18 @@ export const CREATE_EVENT = gql`
 `;
 
 export const UPDATE_EVENT = gql`
-  mutation updateEvent($id: ID!, $title: String!, $content: String!, $date: DateTime!) {
-    updateEvent(id: $id, title: $title, content: $content, date: $date) {
+  mutation updateEvent(
+    $id: ID!
+    $title: String!
+    $content: String!
+    $date: DateTime!
+    $picture: String
+  ) {
+    updateEvent(id: $id, title: $title, content: $content, date: $date, picture: $picture) {
       id
       title
       content
+      picture
       date
       updatedAt
       comments {

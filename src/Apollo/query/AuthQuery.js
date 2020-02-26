@@ -7,6 +7,7 @@ export const ME = gql`
       id
       username
       role
+      picture
     }
   }
 `;

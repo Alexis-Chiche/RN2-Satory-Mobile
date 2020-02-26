@@ -15,6 +15,7 @@ import UsernameInput from '../Components/Inputs/UsernameInput';
 import { LOGOUT, UPDATE_USER } from '../Apollo/mutation/AuthMutation';
 import { ME } from '../Apollo/query/AuthQuery';
 import CameraPicker from '../Components/Buttons/Camera';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -35,8 +36,8 @@ const styles = StyleSheet.create({
   image: {
     marginTop: 15,
     alignSelf: 'center',
-    width: 200,
-    height: 200,
+    width: 240,
+    height: 160,
     borderRadius: 200 / 2
   },
   error: {
@@ -49,9 +50,9 @@ const styles = StyleSheet.create({
 
 function Settings({ navigation, theme }) {
   const client = useApolloClient();
-  const [image, setImage] = useState(null);
   const { loading, error, data } = useQuery(ME);
 
+  const [image, setImage] = useState(data.me.picture);
   const [errForm, setErrForm] = useState(false);
   const [username, setUsername] = useState({ value: data.me.username, error: false });
   const [password, setPassword] = useState({ value: '', error: false });
@@ -101,12 +102,16 @@ function Settings({ navigation, theme }) {
       return;
     }
     updateUser({
-      variables: { password: password.value, username: username.value, role: 'ADMIN' }
+      variables: {
+        password: password.value,
+        username: username.value,
+        picture: image
+      }
     });
   }
 
   if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>{error.message}</Text>;
+  if (error) return <Text>error</Text>;
 
   return (
     <KeyboardAvoidingView style={styles.wrapper} behavior="padding" keyboardVerticalOffset={30}>
@@ -117,7 +122,12 @@ function Settings({ navigation, theme }) {
             Une erreur est survenu, veuillez verifier les champs reseignés et reessayer plus tard.
           </Title>
         )}
-        {image && <Image source={{ uri: image.uri }} style={styles.image} />}
+        {image && (
+          <Image
+            source={{ isStatic: true, uri: `data:image/png;base64,${image}` }}
+            style={styles.image}
+          />
+        )}
         <CameraPicker setImage={setImage} />
         <UsernameInput username={username} setUsername={setUsername} />
         <TextInput underlineColor="gold" label="Role" disabled value={data.me.role} />

@@ -27,11 +27,12 @@ export const LOGOUT = gql`
 `;
 
 export const UPDATE_USER = gql`
-  mutation update_user($password: String!, $username: String!, $role: Role!) {
-    updateUser(password: $password, username: $username, role: $role) {
+  mutation update_user($password: String, $username: String, $picture: String) {
+    updateUser(password: $password, username: $username, picture: $picture) {
       id
       username
       role
+      picture
     }
   }
 `;

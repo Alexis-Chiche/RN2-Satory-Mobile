@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types';
 import { Button, IconButton } from 'react-native-paper';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 import * as Permissions from 'expo-permissions';
 import { StyleSheet, View, Platform } from 'react-native';
@@ -13,12 +14,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     margin: 10,
-    height: 450
+    height: 350
   },
   cameraTouchable: {
     flex: 1,
     backgroundColor: 'transparent',
     flexDirection: 'row',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
     margin: 10
   },
@@ -50,12 +52,20 @@ function CameraPicker({ setImage }) {
   async function takePicture() {
     if (cam) {
       const image = await cam.takePictureAsync({
-        quality: 1,
-        base64: true
+        quality: 1
       });
+      const CompressImage = await ImageManipulator.manipulateAsync(
+        image.uri,
+        [{ resize: { width: 240, height: 160 } }],
+        {
+          compress: 1,
+          format: ImageManipulator.SaveFormat.PNG,
+          base64: true
+        }
+      );
       setNewImage(true);
-      setImage(image);
       setOpenCamera(false);
+      setImage(CompressImage.base64);
     }
   }
 
@@ -63,14 +73,12 @@ function CameraPicker({ setImage }) {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      base64: true
+      quality: 0.1
     });
     if (!result.cancelled) {
       setOpenCamera(false);
       setNewImage(true);
-      setImage(newImage);
+      setImage(result.base64);
     }
   }
 

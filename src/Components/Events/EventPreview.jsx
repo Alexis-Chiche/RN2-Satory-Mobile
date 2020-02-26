@@ -31,6 +31,7 @@ function EventPreview({ theme, navigation, myId, event }) {
 
   return (
     <Card style={[styles.cardEvent, { backgroundColor: colors.accent }]} key={event.id}>
+      {event.picture && <Card.Cover source={{ uri: `data:image/png;base64,${event.picture}` }} />}
       <Card.Content>
         {errEvent && (
           <Paragraph style={styles.error}>Impossible de supprimer, essayez plus tard</Paragraph>
@@ -63,6 +64,7 @@ EventPreview.propTypes = {
     title: PropTypes.string,
     content: PropTypes.string,
     date: PropTypes.string,
+    picture: PropTypes.string,
     author: PropTypes.shape({
       id: PropTypes.string
     }),

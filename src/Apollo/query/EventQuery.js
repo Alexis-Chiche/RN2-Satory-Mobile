@@ -4,9 +4,11 @@ export const GET_MY_EVENTS = gql`
   query me {
     me {
       id
+      picture
       myevents {
         id
         title
+        picture
         content
         date
         updatedAt
@@ -40,6 +42,7 @@ export const GET_ALL_EVENTS = gql`
       title
       content
       date
+      picture
       updatedAt
       comments {
         id
