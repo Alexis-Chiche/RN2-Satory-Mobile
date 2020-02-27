@@ -11,7 +11,7 @@ We use Apollo to link the front with the server and use Graphql as our API.
 To start the project localy be sure to link the Apollo client in "/src/apollo/Client" with the URL of your server.
 
 Usefull link:
-- Apollo: https://www.apollographql.com/docs/react/
+- Apollo: https://www.apollographql.com/docs/react/integrations/react-native/#gatsby-focus-wrapper
 
 ### Starting the application
 
