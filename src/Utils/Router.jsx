@@ -1,4 +1,5 @@
 import React from 'react';
+import { PropTypes } from 'prop-types';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
@@ -11,6 +12,7 @@ import LogoTitle from '../Components/Inputs/Logo';
 import Settings from '../Views/Settings';
 import MyEvents from '../Views/MyEvents';
 import EditEvent from '../Views/EditEvent';
+import Calendar from '../Views/Calendar';
 
 const UnauthNavigator = createStackNavigator(
   {
@@ -32,13 +34,13 @@ const UnauthNavigator = createStackNavigator(
 
 const AuthNavigator = createMaterialTopTabNavigator(
   {
-    'Mes événements': MyEvents
+    'Mes événements': MyEvents,
+    'Evénements à venir': Calendar
   },
   {
     tabBarOptions: {
       activeTintColor: '#D89715',
       labelStyle: { fontSize: 12 },
-      // TODO : Add padding/margin/width to topbar
       style: { backgroundColor: '#0A0908' }
     }
   }
@@ -70,6 +72,7 @@ const EventNavigator = createStackNavigator(
   }
 );
 
+// eslint-disable-next-line react/prop-types
 function RootNavigator({ props, isLoggedIn }) {
   const Router = createSwitchNavigator(
     {

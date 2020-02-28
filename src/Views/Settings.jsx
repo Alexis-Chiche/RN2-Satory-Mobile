@@ -15,7 +15,6 @@ import UsernameInput from '../Components/Inputs/UsernameInput';
 import { LOGOUT, UPDATE_USER } from '../Apollo/mutation/AuthMutation';
 import { ME } from '../Apollo/query/AuthQuery';
 import CameraPicker from '../Components/Buttons/Camera';
-import { createBottomTabNavigator } from 'react-navigation-tabs';
 
 const styles = StyleSheet.create({
   wrapper: {

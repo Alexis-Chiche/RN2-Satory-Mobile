@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PropTypes } from 'prop-types';
 import { AppLoading } from 'expo';
 import { AsyncStorage } from 'react-native';
 
@@ -23,3 +24,8 @@ export default function Splash({ setIsLoggedIn, children }) {
   }
   return <>{children}</>;
 }
+
+Splash.propTypes = {
+  setIsLoggedIn: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired
+};

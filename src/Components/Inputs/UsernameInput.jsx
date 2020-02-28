@@ -1,4 +1,5 @@
 import React from 'react';
+import { PropTypes } from 'prop-types';
 import { HelperText, TextInput } from 'react-native-paper';
 
 export default function UsernameInput({ username, setUsername }) {
@@ -25,3 +26,11 @@ export default function UsernameInput({ username, setUsername }) {
     </>
   );
 }
+
+UsernameInput.propTypes = {
+  username: PropTypes.shape({
+    value: PropTypes.string.isRequired,
+    error: PropTypes.bool.isRequired
+  }).isRequired,
+  setUsername: PropTypes.func.isRequired
+};

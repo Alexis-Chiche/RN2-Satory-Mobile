@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types';
 import { Card, withTheme, Title, Paragraph } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 import AuthorButton from '../Buttons/AuthorButton';
+import ParticipationButton from '../Buttons/ParticipationButton';
 
 const styles = StyleSheet.create({
   cardEvent: {
@@ -34,7 +35,9 @@ function EventPreview({ theme, navigation, myId, event }) {
       {event.picture && <Card.Cover source={{ uri: `data:image/png;base64,${event.picture}` }} />}
       <Card.Content>
         {errEvent && (
-          <Paragraph style={styles.error}>Impossible de supprimer, essayez plus tard</Paragraph>
+          <Paragraph style={styles.error}>
+            Impossible de réaliser cette action, essayez plus tard
+          </Paragraph>
         )}
         <Title style={styles.title}>{event.title}</Title>
         <Paragraph>{`${date}  - ${event.participants.length} participant(s)`}</Paragraph>
@@ -43,7 +46,14 @@ function EventPreview({ theme, navigation, myId, event }) {
       <Card.Actions>
         {event.author.id === myId ? (
           <AuthorButton event={event} navigation={navigation} setErrEvent={setErrEvent} />
-        ) : null}
+        ) : (
+          <ParticipationButton
+            myId={myId}
+            eventId={event.id}
+            participants={event.participants}
+            setErrEvent={setErrEvent}
+          />
+        )}
       </Card.Actions>
     </Card>
   );

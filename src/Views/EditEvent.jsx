@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { PropTypes } from 'prop-types';
 import { ScrollView, KeyboardAvoidingView, StyleSheet, Image } from 'react-native';
 import { withTheme, Button, Title, TextInput } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useMutation } from 'react-apollo';
 
 import { GET_MY_EVENTS } from '../Apollo/query/EventQuery';
 import { CREATE_EVENT, UPDATE_EVENT } from '../Apollo/mutation/EventMutation';
 import CameraPicker from '../Components/Buttons/Camera';
+import DatePicker from '../Components/Buttons/DatePicker';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -20,10 +20,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 15
-  },
-  picker: {
-    marginVertical: 15,
-    alignSelf: 'flex-start'
   },
   error: {
     color: '#D72638',
@@ -129,23 +125,7 @@ function EditEvent({ navigation, theme }) {
           onChangeText={newValue => setEventTitle(newValue)}
           underlineColor="gold"
         />
-        <Button
-          style={styles.picker}
-          icon="clock"
-          onPress={() => {
-            setErrEvent(false);
-            setEventDate({ ...eventDate, show: true });
-          }}
-        >
-          {`Date prévue : ${eventDate.value.toLocaleDateString('en-US')}`}
-        </Button>
-        {eventDate.show && (
-          <DateTimePicker
-            value={eventDate.value}
-            mode="date"
-            onChange={(_, date) => (date ? setEventDate({ value: date, show: false }) : null)}
-          />
-        )}
+        <DatePicker eventDate={eventDate} setEventDate={setEventDate} />
         <TextInput
           label="Details de l'événement"
           value={eventDescr}
